@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+   # User-specific files that might be in the project root
+   Users/
+
+   # Log files
+   *.log
+
+   # Environment files
+   .env
+   .env.local
+
