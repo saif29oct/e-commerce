@@ -1,0 +1,39 @@
+### get all users
+GET http://localhost:8080/users
+
+### get profile address
+GET http://localhost:8080/users/1
+
+###
+GET http://localhost:8080/users/all
+
+###
+GET http://localhost:8080/users/all?sortby=email
+
+###
+POST localhost:8080/users/register
+Content-Type: application/json
+
+{
+    "name":  "Saiful Islam",
+    "email": "saiful-islam@sn-tech.com",
+    "password": "saiful-pass"
+}
+
+###
+PUT http://localhost:8080/users/1/name
+Content-Type: text/plain
+
+Safinaz Islam
+
+###
+PUT http://localhost:8080/users/1
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "email": "updated.email@example.com"
+}
+
+###
+DELETE http://localhost:8080/users/1

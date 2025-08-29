@@ -1,0 +1,48 @@
+@startuml
+
+title Product Module - Entity Relationship Diagram
+header E-Commerce - Product Management System
+footer Generated on %date("yyyy-MM-dd")
+
+skinparam entity {
+  BackgroundColor #FFEEEE
+  BorderColor black
+  ArrowColor blue
+}
+
+' Define entities and their attributes
+
+entity Product {
+    + bigint id pk
+    + varchar(255) name
+    + decimal(10,2) price
+    + tinyint category_id FK
+}
+
+entity Category {
+    + tinyint id PK
+    --
+    String name
+}
+
+entity WishList {
+    + bigint user_id PK FK
+    + bigint product_id PK FK
+}
+
+' Define relationships
+Product ||--|{ WishList
+Product }|--|{ Category
+
+note as conclusion
+**Conclusion:**
+- The Product module has a many-to-one relationship with the
+  Category entity, where each product belongs to one category.
+
+- The Product module also has a many-to-many relationship with
+  the WishList entity, where a user can add multiple products
+  to their wishlist.
+
+end note
+
+@enduml

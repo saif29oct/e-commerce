@@ -1,0 +1,73 @@
+@startuml
+
+title User Module - Entity Relationship Diagram
+header E-Commerce - User Management System
+footer Generated on %date("yyyy-MM-dd")
+
+skinparam entity {
+  BackgroundColor #FFEEEE
+  BorderColor black
+  ArrowColor blue
+}
+
+' Define entities and their attributes
+entity User {
+    + long id PK
+    --
+    String name
+    String email
+    String password
+}
+
+entity WishList {
+    + bigint user_id PK FK
+    + bigint product_id PK FK
+}
+
+entity Address {
+    + long id PK
+    --
+    String street
+    String city
+    String zip
+    long user_id FK
+}
+
+entity Profile {
+    + long id PK
+    --
+    String bio
+    String phoneNumber
+    String dateOfBirth
+    int loyaltyPoints
+}
+
+entity Tag {
+    + long id PK
+    --
+    String name
+}
+
+' Define relationships
+User ||--o{ Address
+User ||--|| Profile
+User }|--|{ Tag
+User ||--o{ WishList
+
+note as conclusion
+**Conclusion:**
+This user module supports a comprehensive
+user management system with the following capabilities:
+- User authentication and profile management
+- Multiple address support per user
+- Product wishlist functionality
+- User categorization through tagging system
+- Loyalty points tracking for customer retention
+
+**Key Design Decisions:**
+- Composite keys used for many-to-many relationships
+- Normalized design to reduce data redundancy
+- Flexible tagging system for user segmentation
+end note
+
+@enduml

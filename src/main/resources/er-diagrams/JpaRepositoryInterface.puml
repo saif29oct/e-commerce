@@ -1,0 +1,29 @@
+@startuml
+interface Repository
+
+interface CrudRepository {
+  +save()
+  +saveAll()
+  +findById()
+  +findAll()
+  +deleteById()
+  +deleteAll()
+  +count()
+}
+
+interface PagingAndSortingRepository {
+  +findAll(sort)
+  +findAll(pageable)
+}
+
+interface JpaRepository {
+  +flush()
+  +findAll(example)
+  +deleteAllInBatch()
+}
+
+CrudRepository ..|> Repository
+PagingAndSortingRepository ..|> Repository
+JpaRepository ..|> CrudRepository
+JpaRepository ..|> PagingAndSortingRepository
+@enduml

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: e-commerce
+  datasource:
+    url: jdbc:mysql://localhost:3310/e_store?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  jpa:
+    show-sql: true
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+  flyway:
+    cleanDisabled: false
