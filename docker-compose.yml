@@ -36,16 +36,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/e_store
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - ${resourceLocalPath}:/app
-      - .m2:/root/.m2
-    working_dir: /app
     stdin_open: true
     tty: true
 
 volumes:
   store-volume:
-  .m2:
 
 networks:
   springboot-network:

@@ -4,9 +4,20 @@ FROM openjdk:21-jdk-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml file and download dependencies
-COPY pom.xml .
+# Copy Maven wrapper and make it executable
+COPY .mvn/ .mvn
+COPY mvnw ./
+RUN chmod +x mvnw
+
+# Copy pom.xml and download dependencies in one step
+COPY pom.xml ./
 RUN ./mvnw dependency:go-offline -B
+
+# Copy the source code
+COPY src ./src
+
+# Build the application
+RUN ./mvnw clean package -DskipTests
 
 # Expose port 8080
 EXPOSE 8080

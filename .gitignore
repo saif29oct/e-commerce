@@ -44,3 +44,4 @@ Users/
 
 ### Docker ###
 .dockerenv
+.m2/
