@@ -116,8 +116,8 @@
                 <version>10.20.0</version>
                 <configuration>
                     <url>jdbc:mysql://localhost:3310/e_store</url>
-                    <user>root</user>
-                    <password>root</password>
+                    <user>saif</user>
+                    <password>pass1234</password>
                     <cleanDisabled>false</cleanDisabled>
                 </configuration>
             </plugin>

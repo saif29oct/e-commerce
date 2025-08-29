@@ -2,20 +2,50 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql-store-container
+    env_file:
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: e_store
-      MYSQL_USER: saif
-      MYSQL_PASSWORD: pass1234
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3310:3306"
     volumes:
       - store-volume:/var/lib/mysql
     networks:
       - springboot-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    build: .
+    container_name: e-commerce-app
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    networks:
+      - springboot-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/e_store
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ${resourceLocalPath}:/app
+      - .m2:/root/.m2
+    working_dir: /app
+    stdin_open: true
+    tty: true
 
 volumes:
   store-volume:
+  .m2:
 
 networks:
   springboot-network:

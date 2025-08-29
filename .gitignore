@@ -32,13 +32,15 @@ build/
 ### VS Code ###
 .vscode/
 
-   # User-specific files that might be in the project root
-   Users/
+### User-specific files ###
+Users/
 
-   # Log files
-   *.log
+### Log files ###
+*.log
 
-   # Environment files
-   .env
-   .env.local
+### Environment files ###
+.env
+.env.local
 
+### Docker ###
+.dockerenv
