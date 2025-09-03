@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 
 /**
  * @author saif
@@ -24,4 +25,7 @@ public class Category {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToMany(mappedBy = "categories")
+    private List<Product> products;
 }

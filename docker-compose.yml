@@ -1,16 +1,14 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.43
     container_name: mysql-store-container
-    env_file:
-      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: e_store
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3310:3306"
+      - "${MYSQL_PORT}:3306"
     volumes:
       - store-volume:/var/lib/mysql
     networks:
@@ -20,24 +18,25 @@ services:
       timeout: 20s
       retries: 10
 
-  app:
-    build: .
-    container_name: e-commerce-app
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
-    networks:
-      - springboot-network
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/e_store
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-    stdin_open: true
-    tty: true
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: e-commerce-app
+#    ports:
+#      - "${APP_PORT}:8080"
+#    networks:
+#      - springboot-network
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/e_store
+#      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+#      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+#      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+#    stdin_open: true
+#    tty: true
 
 volumes:
   store-volume:

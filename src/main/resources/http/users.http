@@ -15,16 +15,18 @@ POST localhost:8080/users/register
 Content-Type: application/json
 
 {
-    "name":  "Saiful Islam",
-    "email": "saiful-islam@sn-tech.com",
-    "password": "saiful-pass"
+    "name":  "Najnin Ahmed",
+    "email": "najnin-ahmed@sn-tech.com",
+    "password": "najnin-pass"
 }
 
 ###
-PUT http://localhost:8080/users/1/name
-Content-Type: text/plain
+PUT http://localhost:8080/users/3/name
+Content-Type: application/json
 
-Safinaz Islam
+{
+  "name":  "Najnin Islam"
+}
 
 ###
 PUT http://localhost:8080/users/1

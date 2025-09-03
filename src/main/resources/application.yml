@@ -2,15 +2,36 @@ spring:
   application:
     name: e-commerce
   datasource:
-    url: jdbc:mysql://localhost:3310/e_store?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: saif
-    password: pass1234
+    # Prefer SPRING_DATASOURCE_* if provided (e.g., from docker-compose), otherwise fall back to local defaults/.env
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:${MYSQL_PORT:3310}/${MYSQL_DATABASE:e_store}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${MYSQL_USER:saif}
+    password: ${MYSQL_PASSWORD:pass1234}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
+#    hibernate:
+#      ddl-auto: none
+#    properties:
+#      javax:
+#        persistence:
+#          schema-source: none
   devtools:
     restart:
       enabled: true
     livereload:
       enabled: true
   flyway:
-    cleanDisabled: false
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    out-of-order: false
+    clean-disabled: false
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate: DEBUG
+    org.flywaydb: DEBUG

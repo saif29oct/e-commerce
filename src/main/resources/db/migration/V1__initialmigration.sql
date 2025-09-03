@@ -1,3 +1,6 @@
+-- Initial database schema for the e-commerce application
+
+-- Create categories table
 create table categories
 (
     id   tinyint unsigned auto_increment
@@ -5,18 +8,17 @@ create table categories
     name varchar(255) not null
 );
 
+-- Create products table
 create table products
 (
     id          bigint auto_increment
         primary key,
     name        varchar(255)     not null,
     description varchar(256)     null,
-    price       decimal(10, 2)   null,
-    category_id tinyint unsigned null,
-    constraint products_categories_id_fk
-        foreign key (category_id) references categories (id)
+    price       decimal(10, 2)   null
 );
 
+-- Create tags table
 create table tags
 (
     id   int auto_increment
@@ -24,6 +26,7 @@ create table tags
     name varchar(100) not null
 );
 
+-- Create users table
 create table users
 (
     id       bigint auto_increment
@@ -33,6 +36,7 @@ create table users
     password varchar(64)  not null
 );
 
+-- Create addresses table
 create table addresses
 (
     id      bigint auto_increment
@@ -45,6 +49,7 @@ create table addresses
         foreign key (user_id) references users (id)
 );
 
+-- Create profiles table
 create table profiles
 (
     id             bigint auto_increment
@@ -57,6 +62,7 @@ create table profiles
         foreign key (id) references users (id)
 );
 
+-- Create user_tags table
 create table user_tags
 (
     user_id bigint not null,
@@ -70,6 +76,7 @@ create table user_tags
             on delete cascade
 );
 
+-- Create wishlist table
 create table wishlist
 (
     user_id    bigint not null,
@@ -83,9 +90,22 @@ create table wishlist
             on delete cascade
 );
 
-create
-    definer = root@`%` procedure getProductsByPriceRange(IN minPrice decimal(10, 2), IN maxPrice decimal(10, 2))
-BEGIN
-    SELECT `id`, `name`, `description`, `price`, `category_id` FROM products WHERE price >= minPrice AND price <= maxPrice;
-END;
+-- Create the junction table for many-to-many relationship between products and categories
+CREATE TABLE product_category
+(
+    product_id  BIGINT NOT NULL,
+    category_id TINYINT UNSIGNED NOT NULL,
+    PRIMARY KEY (product_id, category_id),
+    CONSTRAINT fk_product_category_product
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    CONSTRAINT fk_product_category_category
+        FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
+);
 
+-- Note: This schema addresses the data type inconsistency between:
+-- 1. Database schema (categories.id = TINYINT UNSIGNED) 
+-- 2. JPA entities (Category.id = Long)
+-- 
+-- The approach is to modify the JPA entities to match the database schema rather than 
+-- changing the database which would be a breaking change.
+-- The JPA entity Category should use @Column(columnDefinition = "TINYINT UNSIGNED") for the id field.

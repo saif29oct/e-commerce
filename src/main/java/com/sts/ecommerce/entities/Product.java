@@ -34,7 +34,19 @@ public class Product {
     @JoinTable(
         name = "product_category",
         joinColumns = @JoinColumn(name = "product_id"),
-        inverseJoinColumns = @JoinColumn(name = "category_id")
+        inverseJoinColumns = @JoinColumn(name = "category_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "category_id"})
     )
     private List<Category> categories;
+    
+    // Helper method to manage the bidirectional relationship
+    public void addCategory(Category category) {
+        categories.add(category);
+        category.getProducts().add(this);
+    }
+    
+    public void removeCategory(Category category) {
+        categories.remove(category);
+        category.getProducts().remove(this);
+    }
 }

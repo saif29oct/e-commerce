@@ -17,20 +17,30 @@ import java.util.List;
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    
+    // Custom query methods with explicit JPQL definitions
     @Query("SELECT new com.sts.ecommerce.dtos.UserDto(u.id, u.name, u.email) FROM User u")
     List<UserDto> findAllUsers();
     
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile LEFT JOIN FETCH u.addresses WHERE u.id = :id")
     User findUserWithProfileAndAddressesByUserId(@Param("id") Long id);
-
-    @Override
+    
+    // Standard query methods with derived queries
     @EntityGraph(attributePaths = {"profile", "addresses"})
+    @Query("SELECT u FROM User u")
     @NonNull
     List<User> findAll();
 
-    @Override
     @EntityGraph(attributePaths = {"profile", "addresses"})
+    @Query("SELECT u FROM User u")
     @NonNull
     List<User> findAll(Sort sort);
-
+    
+    // Explicit query derivation for common operations
+    @Query("SELECT u FROM User u WHERE u.id = ?1")
+    User findUserById(Long id);
+    
+    @EntityGraph(attributePaths = {"profile", "addresses"})
+    @Query("SELECT u FROM User u WHERE u.id = ?1")
+    User findUserWithProfileAndAddressesById(Long id);
 }
