@@ -1,0 +1,87 @@
+# E-commerce API Testing with CSV Data - Bulk Operations
+
+### Run Bulk CSV Test
+// This request demonstrates how to process all CSV data in one go
+POST http://{{host}}/products/bulk
+Content-Type: application/json
+
+[]
+
+> {%
+    // Pre-request script to prepare for CSV data testing and process all CSV data at once
+    const csvData = `name,description,price,categoryId
+"Test Product 1","This is the first test product",29.99,1
+"Test Product 2","This is the second test product",39.99,2
+"Test Product 3","This is the third test product",19.99,1
+"Special Product","A special product for testing",99.99,3
+"Budget Item","An affordable item",9.99,1`;
+    
+    // Parse CSV data
+    const lines = csvData.trim().split('\n');
+    const headers = lines[0].split(',');
+    const products = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        const product = {};
+        for (let j = 0; j < headers.length; j++) {
+            // Remove quotes from values
+            product[headers[j]] = values[j].replace(/"/g, '');
+        }
+        products.push(product);
+    }
+    
+    const bulkProducts = products.map(product => ({
+        name: product.name,
+        description: product.description,
+        price: parseFloat(product.price),
+        categoryId: parseInt(product.categoryId)
+    }));
+    
+    request.body = JSON.stringify(bulkProducts);
+    client.log("Sending bulk request with " + bulkProducts.length + " products");
+    
+    // Store created product IDs for cleanup
+    client.global.set("testProductsForBulk", JSON.stringify(bulkProducts));
+    
+    // Post-response script to validate bulk creation
+    request.onResponse(function(response) {
+        client.test("Bulk creation successful", function() {
+            client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+        });
+        
+        const createdProducts = JSON.parse(response.body);
+        client.log("Successfully created " + createdProducts.length + " products in bulk");
+        
+        // Store created product IDs for cleanup
+        const createdIds = createdProducts.map(p => p.id);
+        client.global.set("bulkProductIds", JSON.stringify(createdIds));
+    });
+%}
+
+### Clean Up Bulk Created Products
+DELETE http://{{host}}/products/cleanup
+Content-Type: application/json
+
+{
+  "ids": []
+}
+
+> {%
+    // Pre-request script to prepare cleanup
+    const ids = JSON.parse(client.global.get("bulkProductIds") || "[]");
+    request.body = JSON.stringify({ids: ids});
+    client.log("Cleaning up " + ids.length + " bulk created products");
+    
+    // Post-response script for bulk cleanup validation
+    request.onResponse(function(response) {
+        client.test("Bulk cleanup successful", function() {
+            client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+        });
+        
+        client.log("Completed bulk cleanup");
+        // Clear global variables
+        client.global.clear("bulkProductIds");
+        client.global.clear("testProductsForBulk");
+    });
+%}

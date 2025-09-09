@@ -1,0 +1,113 @@
+# E-commerce API Testing with CSV Data
+
+// Pre-request script to prepare for CSV data testing
+> {%
+    // In a real scenario, you would load CSV data from a file
+    // For this example, we'll define the data directly in the script
+    
+    // Simulate reading CSV data
+    const csvData = `name,description,price,categoryId
+"Test Product 1","This is the first test product",29.99,1
+"Test Product 2","This is the second test product",39.99,2
+"Test Product 3","This is the third test product",19.99,1
+"Special Product","A special product for testing",99.99,3
+"Budget Item","An affordable item",9.99,1`;
+    
+    // Parse CSV data
+    const lines = csvData.trim().split('\n');
+    const headers = lines[0].split(',');
+    const products = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        const product = {};
+        for (let j = 0; j < headers.length; j++) {
+            // Remove quotes from values
+            product[headers[j]] = values[j].replace(/"/g, '');
+        }
+        products.push(product);
+    }
+    
+    // Store the products array for use in requests
+    client.global.set("testProducts", JSON.stringify(products));
+    client.log("Loaded " + products.length + " products from CSV data");
+    
+    // Initialize counter
+    client.global.set("currentProductIndex", "0");
+%}
+
+### Create Product with CSV Data
+POST http://{{host}}/products
+Content-Type: application/json
+
+{
+  "name": "Placeholder Product",
+  "description": "This will be replaced by CSV data",
+  "price": 0,
+  "categoryId": 1
+}
+
+> {%
+    // Pre-request script to customize the request with CSV data
+    const products = JSON.parse(client.global.get("testProducts"));
+    const currentIndex = parseInt(client.global.get("currentProductIndex"));
+    
+    if (currentIndex < products.length) {
+        const product = products[currentIndex];
+        // Update the request body with data from CSV
+        request.body = JSON.stringify({
+            name: product.name,
+            description: product.description,
+            price: parseFloat(product.price),
+            categoryId: parseInt(product.categoryId)
+        });
+        
+        client.log("Creating product " + (currentIndex + 1) + "/" + products.length + ": " + product.name);
+        // Update the index for the next request
+        client.global.set("currentProductIndex", (currentIndex + 1).toString());
+        // Store the product name for validation
+        client.global.set("expectedProductName", product.name);
+    } else {
+        client.log("All products from CSV have been processed");
+        request.abort(); // Cancel the request if no more data
+    }
+%}
+
+### Validate Created Product
+GET http://{{host}}/products
+Accept: application/json
+
+> {%
+    // Post-response script to validate the created product
+    client.test("Response status is 200", function() {
+        client.assert(response.status === 200, "Expected response status to be 200, but got " + response.status);
+    });
+    
+    const products = JSON.parse(response.body);
+    const expectedName = client.global.get("expectedProductName");
+    
+    if (expectedName) {
+        const foundProduct = products.find(p => p.name === expectedName);
+        client.test("Product was created successfully", function() {
+            client.assert(foundProduct !== undefined, "Expected to find product with name: " + expectedName);
+        });
+        
+        if (foundProduct) {
+            client.log("Successfully validated product: " + foundProduct.name);
+            // Store product ID for cleanup
+            client.global.set("lastCreatedProductId", foundProduct.id.toString());
+        }
+    }
+%}
+
+### Clean Up - Delete Last Created Product
+DELETE http://{{host}}/products/{{lastCreatedProductId}}
+
+> {%
+    // Post-response script for cleanup
+    client.test("Product deleted successfully", function() {
+        client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+    });
+    
+    client.log("Cleaned up product with ID: " + client.global.get("lastCreatedProductId"));
+%}

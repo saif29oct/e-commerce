@@ -1,0 +1,76 @@
+# E-commerce API Testing with Debugging Features
+
+## Get Products with Response Validation
+GET http://{{host}}/products
+Accept: application/json
+
+> {%
+    client.test("Response status is 200", function() {
+        client.assert(response.status === 200, "Expected response status to be 200, but got " + response.status);
+    });
+    
+    client.test("Response has content-type header", function() {
+        client.assert(response.headers.valueOf("content-type"), "Response should have content-type header");
+    });
+    
+    client.test("Response contains products array", function() {
+        const products = JSON.parse(response.body);
+        client.assert(Array.isArray(products), "Response body should be an array");
+        client.log("Found " + products.length + " products");
+    });
+%}
+
+### Create Product and Store ID for Later Use
+POST http://{{host}}/products
+Content-Type: application/json
+
+{
+  "name": "Debug Test Product",
+  "description": "Product created for debugging purposes",
+  "price": 49.99,
+  "categoryId": 1
+}
+
+> {%
+    client.test("Product created successfully", function() {
+        client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+    });
+    
+    // Store the created product ID for later use
+    const product = JSON.parse(response.body);
+    if (product && product.id) {
+        client.global.set("testProductId", product.id.toString());
+        client.log("Stored product ID: " + product.id);
+    }
+%}
+
+### Get Created Product by Stored ID
+GET http://{{host}}/products/{{testProductId}}
+Accept: application/json
+
+> {%
+    client.test("Can retrieve created product", function() {
+        client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+    });
+    
+    const product = JSON.parse(response.body);
+    client.test("Product name matches", function() {
+        client.assert(product.name === "Debug Test Product", 
+            "Expected product name to be 'Debug Test Product', but got '" + product.name + "'");
+    });
+    
+    client.log("Successfully validated product: " + product.name);
+%}
+
+### Clean Up - Delete Test Product
+DELETE http://{{host}}/products/{{testProductId}}
+
+> {%
+    client.test("Product deleted successfully", function() {
+        client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+    });
+    
+    client.log("Cleaned up test product with ID: " + client.global.get("testProductId"));
+    // Clean up the global variable
+    client.global.clear("testProductId");
+%}

@@ -4,3 +4,26 @@ GET http://localhost:8080/products
 ###
 GET http://localhost:8080/products/1
 x-auth-tokeon: 1234
+
+### Create Product
+POST http://localhost:8080/products/create-product
+Content-Type: application/json
+
+{
+    "name": "Product 1",
+    "description": "This is a product",
+    "price": 10.99
+}
+
+### Update Product
+PUT http://localhost:8080/products/update-product/1
+Content-Type: application/json
+
+{
+    "name": "Kitchen Sink Ultimate",
+    "description": "This is a kitchen product",
+    "price": 10.99
+}
+
+### Delete Product
+DELETE http://localhost:8080/products/delete-product/1

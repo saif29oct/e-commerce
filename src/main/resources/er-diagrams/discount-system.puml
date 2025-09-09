@@ -1,0 +1,134 @@
+@startuml
+
+title Discount System - Entity Relationship Diagram
+header E-Commerce - Discount Management System
+footer Generated on %date("yyyy-MM-dd")
+
+skinparam entity {
+  BackgroundColor #FFEEEE
+  BorderColor black
+  ArrowColor blue
+}
+
+' Entities
+
+entity Product {
+    * long id PK
+    --
+    + String name
+    + String description
+    + double base_price
+    + long category_id FK
+    + boolean is_discountable
+    + Timestamp created_at
+    + Timestamp updated_at
+}
+
+entity Category {
+    * long id PK
+    --
+    + String name
+    + long parent_category_id FK
+    + boolean discount_eligibility
+    + Timestamp created_at
+    + Timestamp updated_at
+}
+
+entity Promotion {
+    * long id PK
+    --
+    + String name
+    + String description
+    + String type
+    + double value
+    + String scope
+    + int priority
+    + Timestamp start_date
+    + Timestamp end_date
+    + boolean is_active
+    + int max_uses
+    + int current_uses
+    + String stacking_type
+    + Timestamp created_at
+    + Timestamp updated_at
+}
+
+entity Coupon {
+    * long id PK
+    --
+    + String code
+    + long promotion_id FK
+    + String user_restriction
+    + double min_order_amount
+    + double max_discount_amount
+    + boolean single_use
+    + Timestamp created_at
+}
+
+entity BogoOffer {
+    * long id PK
+    --
+    + long promotion_id FK
+    + String name
+    + String description
+    + boolean allow_other_discounts
+    + Timestamp created_at
+    + Timestamp updated_at
+}
+
+entity BogoRule {
+    * long id PK
+    --
+    + long bogo_offer_id FK
+    + int buy_quantity
+    + int get_quantity
+    + String discount_type
+    + double discount_value
+    + String applies_to
+    + Timestamp created_at
+    + Timestamp updated_at
+}
+
+entity OrderDiscount {
+    * long id PK
+    --
+    + long order_id FK
+    + long promotion_id FK
+    + long coupon_id FK
+    + double applied_amount
+    + String description
+    + Timestamp created_at
+    + Timestamp updated_at
+}
+
+' Relationships
+
+Product ||--|{ Category : "belongs to"
+Promotion ||--o{ Coupon : "has"
+Promotion ||--o{ BogoOffer : "has"
+BogoOffer ||--o{ BogoRule : "defines"
+Product }o--o{ Promotion : "discounted by"
+Promotion ||--o{ OrderDiscount : "applied in"
+Coupon ||--o{ OrderDiscount : "used in"
+Category ||--o{ Category : "parent of"
+
+note as conclusion
+**Conclusion:**
+This discount system supports a comprehensive
+promotion management system with the following capabilities:
+- Product and category-based promotions
+- Multiple promotion types (percentage, fixed amount, BOGO, free shipping)
+- Coupon code system with user restrictions
+- Buy-One-Get-One (BOGO) offer functionality
+- Order-level discount tracking
+- Flexible promotion stacking rules
+
+**Key Design Decisions:**
+- Normalized design to reduce data redundancy
+- Support for various discount types and rules
+- Clear separation between promotions, coupons, and order discounts
+- Flexible BOGO offer configuration
+- Direct many-to-many relationship between Product and Promotion for simpler design
+end note
+
+@enduml

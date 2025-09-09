@@ -112,25 +112,25 @@ public class UserController {
         return ResponseEntity.ok(updatedUserDto);
     }
 
-//    @PutMapping("/{id}/name")
-//    public ResponseEntity<UserDto> updateUserName(
-//            @PathVariable Long id,
-//            @RequestBody String name
-//    ) {
-//        User user = userRepository.findById(id)
-//                .orElse(null);
-//
-//        if (user == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        user.setName(name);
-//
-//        User updatedUser = userRepository.save(user);
-//
-//        UserDto updatedUserDto = userMapper.userToUserDto(updatedUser);
-//        return ResponseEntity.ok(updatedUserDto);
-//    }
+    @PutMapping("/{id}/email")
+    public ResponseEntity<UserDto> updateUserEmail(
+            @PathVariable Long id,
+            @RequestBody String email
+    ) {
+        User user = userRepository.findById(id)
+                .orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        user.setEmail(email);
+
+        User updatedUser = userRepository.save(user);
+
+        UserDto updatedUserDto = userMapper.userToUserDto(updatedUser);
+        return ResponseEntity.ok(updatedUserDto);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
