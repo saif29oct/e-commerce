@@ -1,99 +1,94 @@
--- Initial database schema for the e-commerce application
+-- Consolidated database schema for the e-commerce application
+-- This file consolidates all previous migrations (V1-V7) into a single migration
 
 -- Create categories table
-create table categories
+CREATE TABLE categories
 (
-    id   tinyint unsigned auto_increment
-        primary key,
-    name varchar(255) not null
+    id   TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
 );
 
--- Create products table
-create table products
+-- Create a product table
+CREATE TABLE products
 (
-    id          bigint auto_increment
-        primary key,
-    name        varchar(255)     not null,
-    description varchar(256)     null,
-    price       decimal(10, 2)   null
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(255)   NOT NULL,
+    description VARCHAR(256)   NULL,
+    price       DECIMAL(10, 2) NULL
 );
 
 -- Create tags table
-create table tags
+CREATE TABLE tags
 (
-    id   int auto_increment
-        primary key,
-    name varchar(100) not null
+    id   INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
 );
 
 -- Create users table
-create table users
+CREATE TABLE users
 (
-    id       bigint auto_increment
-        primary key,
-    name     varchar(50)  not null,
-    email    varchar(100) not null,
-    password varchar(64)  not null
+    id       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name     VARCHAR(50)  NOT NULL,
+    email    VARCHAR(100) NOT NULL,
+    password VARCHAR(64)  NOT NULL
 );
 
 -- Create addresses table
-create table addresses
+CREATE TABLE addresses
 (
-    id      bigint auto_increment
-        primary key,
-    street  varchar(255) null,
-    city    varchar(100) null,
-    zip     varchar(100) null,
-    user_id bigint       not null,
-    constraint fk_user
-        foreign key (user_id) references users (id)
+    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    street  VARCHAR(255) NULL,
+    city    VARCHAR(100) NULL,
+    zip     VARCHAR(100) NULL,
+    user_id BIGINT       NOT NULL,
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 -- Create profiles table
-create table profiles
+CREATE TABLE profiles
 (
-    id             bigint auto_increment
-        primary key,
-    bio            text                     null,
-    phone_number   varchar(15)              null,
-    date_of_birth  date                     null,
-    loyalty_points int unsigned default '0' null,
-    constraint profiles_users_id_fk
-        foreign key (id) references users (id)
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    bio            TEXT                     NULL,
+    phone_number   VARCHAR(15)              NULL,
+    date_of_birth  DATE                     NULL,
+    loyalty_points INT UNSIGNED DEFAULT '0' NULL,
+    CONSTRAINT profiles_users_id_fk
+        FOREIGN KEY (id) REFERENCES users (id)
 );
 
 -- Create user_tags table
-create table user_tags
+CREATE TABLE user_tags
 (
-    user_id bigint not null,
-    tag_id  int    not null,
-    primary key (user_id, tag_id),
-    constraint user_tags_tags_id_fk
-        foreign key (tag_id) references tags (id)
-            on delete cascade,
-    constraint user_tags_users_id_fk
-        foreign key (user_id) references users (id)
-            on delete cascade
+    user_id BIGINT NOT NULL,
+    tag_id  INT    NOT NULL,
+    PRIMARY KEY (user_id, tag_id),
+    CONSTRAINT user_tags_tags_id_fk
+        FOREIGN KEY (tag_id) REFERENCES tags (id)
+            ON DELETE CASCADE,
+    CONSTRAINT user_tags_users_id_fk
+        FOREIGN KEY (user_id) REFERENCES users (id)
+            ON DELETE CASCADE
 );
 
 -- Create wishlist table
-create table wishlist
+CREATE TABLE wishlist
 (
-    user_id    bigint not null,
-    product_id bigint not null,
-    primary key (user_id, product_id),
-    constraint wishlist_product_fk
-        foreign key (product_id) references products (id)
-            on delete cascade,
-    constraint wishlist_user_fk
-        foreign key (user_id) references users (id)
-            on delete cascade
+    user_id    BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, product_id),
+    CONSTRAINT wishlist_product_fk
+        FOREIGN KEY (product_id) REFERENCES products (id)
+            ON DELETE CASCADE,
+    CONSTRAINT wishlist_user_fk
+        FOREIGN KEY (user_id) REFERENCES users (id)
+            ON DELETE CASCADE
 );
 
 -- Create the junction table for many-to-many relationship between products and categories
 CREATE TABLE product_category
 (
-    product_id  BIGINT NOT NULL,
+    product_id  BIGINT           NOT NULL,
     category_id TINYINT UNSIGNED NOT NULL,
     PRIMARY KEY (product_id, category_id),
     CONSTRAINT fk_product_category_product
@@ -102,10 +97,26 @@ CREATE TABLE product_category
         FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
 );
 
--- Note: This schema addresses the data type inconsistency between:
--- 1. Database schema (categories.id = TINYINT UNSIGNED) 
--- 2. JPA entities (Category.id = Long)
--- 
--- The approach is to modify the JPA entities to match the database schema rather than 
--- changing the database which would be a breaking change.
--- The JPA entity Category should use @Column(columnDefinition = "TINYINT UNSIGNED") for the id field.
+-- Create carts table (consolidated from V2 and V3)
+CREATE TABLE carts
+(
+    id           BINARY(16) NOT NULL PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+    date_created DATE       NOT NULL             DEFAULT (CURRENT_DATE)
+);
+
+-- Create cart_items table (consolidated from V2, V4, V5, V6, and V7)
+CREATE TABLE cart_items
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    cart             BINARY(16) NOT NULL,
+    product_id       BIGINT     NOT NULL,
+    product_quantity INT DEFAULT 1 NOT NULL,
+    CONSTRAINT cart_item_product_unique
+        UNIQUE (cart, product_id),
+    CONSTRAINT cart_items_ibfk_1
+        FOREIGN KEY (cart) REFERENCES carts (id)
+            ON DELETE CASCADE,
+    CONSTRAINT cart_items_ibfk_2
+        FOREIGN KEY (product_id) REFERENCES products (id)
+            ON DELETE CASCADE
+);

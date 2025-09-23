@@ -1,6 +1,5 @@
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -32,16 +31,68 @@ build/
 ### VS Code ###
 .vscode/
 
-### User-specific files ###
-Users/
+### OS-specific files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+### Temporary files ###
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+*.bak
+*.orig
+
+### Spring Boot ###
+*.pid
+*.seed
+*.pid.lock
+
+### Database ###
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
 
 ### Log files ###
 *.log
+logs/
+log/
 
 ### Environment files ###
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 ### Docker ###
 .dockerenv
 .m2/
+
+### Documentation ###
+docs/diagrams/generated/
+*.png
+*.svg
+*.pdf
+!docs/diagrams/**/*.puml
+
+### API Testing ###
+*.http.private
+http-client.private.env.json
+
+### AI Assistants ###
+.junie/
+.lingma/
+
+### Maven ###
+.mvn/
+dependency-reduced-pom.xml
+.flattened-pom.xml
+!/.mvn/wrapper/maven-wrapper.properties
