@@ -4,13 +4,13 @@ GET http://localhost:8080/users
 ### get profile address
 GET http://localhost:8080/users/1
 
-###
+### get all users
 GET http://localhost:8080/users/all
 
-###
+### get user by email
 GET http://localhost:8080/users/all?sortby=email
 
-###
+### register user
 POST http://localhost:8080/users/register
 Content-Type: application/json
 
@@ -20,7 +20,7 @@ Content-Type: application/json
     "password": "najnin-pass"
 }
 
-###
+### update name
 PUT http://localhost:8080/users/3/name
 Content-Type: application/json
 
@@ -28,7 +28,7 @@ Content-Type: application/json
   "name":  "Najnin Islam"
 }
 
-###
+### update name and email
 PUT http://localhost:8080/users/1
 Content-Type: application/json
 
@@ -37,7 +37,7 @@ Content-Type: application/json
   "email": "updated.email@example.com"
 }
 
-###
+### delete user
 DELETE http://localhost:8080/users/1
 
 ### get all deleted users
