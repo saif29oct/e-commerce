@@ -1,0 +1,35 @@
+### Create a new cart
+POST http://localhost:8080/carts
+Content-Type: application/json
+
+{
+}
+
+### Get all carts
+GET http://localhost:8080/carts
+
+### Get a specific cart by ID
+GET http://localhost:8080/carts/{id}
+
+### Add item to cart
+POST http://localhost:8080/carts/{id}/items
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+### Update item quantity in cart
+PUT http://localhost:8080/carts/{id}/items/{itemId}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### Remove item from cart
+DELETE http://localhost:8080/carts/{id}/items/{itemId}
+
+### Clear all items from cart
+DELETE http://localhost:8080/carts/{id}/items
