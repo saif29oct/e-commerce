@@ -1,5 +1,5 @@
 ### Create a new cart
-POST http://localhost:8080/carts
+POST http://localhost:8080/carts/create
 Content-Type: application/json
 
 {

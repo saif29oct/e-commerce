@@ -23,7 +23,7 @@ public class Cart {
     @UuidGenerator
     private UUID id;
 
-    @Column(name = "date_created")
+    @Column(name = "date_created", updatable = false, nullable = false)
     private LocalDate dateCreated;
 
     @OneToMany(mappedBy = "cart")
